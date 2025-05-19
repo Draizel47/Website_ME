@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinansiKu</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+      color: white;
+      padding: 32px 20px 24px 20px;
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      border-radius: 0 0 32px 32px;
+      box-shadow: 0 4px 16px rgba(24,90,157,0.08);
+      margin-bottom: 24px;
+      transition: background 0.5s;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto 32px auto;
+      padding: 24px 24px 32px 24px;
+      background-color: #fff;
+      border-radius: 24px;
+      box-shadow: 0 4px 24px rgba(24,90,157,0.08);
+      transition: box-shadow 0.3s;
+      animation: fadeIn 0.7s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(40px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .hidden {
+      display: none;
+    }
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-bottom: 32px;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .summary-box {
+      background: linear-gradient(135deg, #f8ffae 0%, #43c6ac 100%);
+      border-radius: 16px;
+      padding: 18px 28px;
+      min-width: 180px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(67,198,172,0.08);
+      color: #185a9d;
+    }
+    .summary-box .icon {
+      font-size: 2rem;
+      margin-right: 8px;
+    }
+    .main-flex {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 260px;
+      flex: 1 1 260px;
+      background: #f4f6f8;
+      border-radius: 16px;
+      padding: 24px 18px;
+      box-shadow: 0 2px 8px rgba(24,90,157,0.04);
+    }
+    input, button {
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1.1rem;
+      transition: border 0.2s;
+    }
+    input:focus {
+      border: 1.5px solid #43cea2;
+      outline: none;
+    }
+    button {
+      background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border: none;
+      box-shadow: 0 2px 8px rgba(24,90,157,0.08);
+      transition: background 0.2s, transform 0.1s;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #185a9d 0%, #43cea2 100%);
+      transform: scale(1.03);
+    }
+    .entry-card {
+      background: #f8ffae;
+      padding: 16px 18px;
+      margin-top: 14px;
+      border-radius: 14px;
+      border-left: 6px solid #43cea2;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 8px rgba(67,198,172,0.06);
+      transition: box-shadow 0.2s, transform 0.2s;
+      animation: fadeIn 0.5s;
+    }
+    .entry-card.income { border-left-color: #2196f3; }
+    .entry-card.expense { border-left-color: #f44336; }
+    .entry-card:hover {
+      box-shadow: 0 6px 18px rgba(67,198,172,0.13);
+      transform: translateY(-2px) scale(1.01);
+    }
+    .guide-link {
+      margin-top: 10px;
+      font-size: 15px;
+      color: #185a9d;
+      cursor: pointer;
+      text-decoration: underline;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+    }
+    .guide-link:hover {
+      color: #43cea2;
+    }
+    .quote-box {
+      margin-top: 20px;
+      font-style: italic;
+      color: #555;
+      text-align: center;
+      font-size: 1.1rem;
+      background: #e0eafc;
+      border-radius: 12px;
+      padding: 10px 0;
+      letter-spacing: 0.5px;
+    }
+    footer {
+      text-align: center;
+      color: #185a9d;
+      font-size: 1rem;
+      margin: 0 0 18px 0;
+      letter-spacing: 1px;
+      opacity: 0.7;
+    }
+    @media (max-width: 900px) {
+      .main-flex {
+        flex-direction: column;
+        gap: 20px;
+      }
+      .container {
+        padding: 12px 4vw 24px 4vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Page -->
+  <div id="loginPage" class="container">
+    <h1 style="margin-bottom:32px;">Selamat Datang di <span style="color:#43cea2;">FinansiKu</span></h1>
+    <input type="text" id="usernameInput" placeholder="Masukkan Nama Pengguna" autocomplete="off" />
+    <button onclick="enterApp()">Masuk</button>
+    <div class="guide-link" onclick="showGuide()">Lihat Buku Panduan</div>
+  </div>
+
+  <!-- Guide Page -->
+  <div id="guidePage" class="container hidden">
+    <h1>Buku Panduan</h1>
+    <ol style="text-align:left; font-size:1.1rem;">
+      <li>Masukkan tanggal, deskripsi, dan jumlah transaksi.</li>
+      <li>Klik <b>Tambah</b> untuk menambah transaksi.</li>
+      <li>Transaksi akan muncul di bawah dan grafik akan otomatis terupdate.</li>
+      <li>Warna biru untuk pemasukan, merah untuk pengeluaran.</li>
+    </ol>
+    <button onclick="backToLogin()">Kembali</button>
+  </div>
+
+  <!-- Main App Page -->
+  <div id="mainApp" class="container hidden">
+    <header id="mainHeader">FinansiKu</header>
+    <div class="summary">
+      <div class="summary-box"><span class="icon">💰</span> <span id="currentBalance">Rp0</span></div>
+      <div class="summary-box"><span class="icon">🧮</span> <span id="totalDisplay">TOTAL: Rp0</span></div>
+      <div class="summary-box"><span class="icon">📉</span> <span id="lossDisplay">Kerugian: Rp0</span></div>
+      <div class="summary-box"><span class="icon">📈</span> <span id="growthRate">Pertumbuhan: 0 Rp/hari</span></div>
+    </div>
+    <div class="quote-box" id="dailyQuote"></div>
+    <div class="main-flex">
+      <div class="input-group">
+        <input type="date" id="date" />
+        <input type="text" id="desc" placeholder="Deskripsi" />
+        <input type="number" id="amount" placeholder="Jumlah (Rp, negatif = pengeluaran)" />
+        <button onclick="addTransaction()">+ Tambah Transaksi</button>
+      </div>
+    </div>
+    <div id="entries"></div>
+    <canvas id="myChart" width="400" height="200" style="margin-top:32px;"></canvas>
+  </div>
+  <footer>
+    &copy; 2025 FinansiKu &mdash; Aplikasi Keuangan Pribadi
+  </footer>
+  <script>
+    let total = 0;
+    let loss = 0;
+    let transactions = [];
+    let chart;
+    let username = "";
+
+    const quotes = [
+      "Hemat pangkal kaya.",
+      "Buat uang bekerja untukmu, bukan sebaliknya.",
+      "Investasi terbaik adalah pada dirimu sendiri.",
+      "Disiplin finansial adalah kunci kebebasan finansial.",
+      "Jangan menabung yang tersisa, tapi belanjakan yang tersisa setelah menabung.",
+      "Setiap rupiah yang kamu simpan hari ini adalah kebebasan di masa depan.",
+      "Kendalikan uangmu sebelum uang mengendalikanmu.",
+      "Mulai dari kecil, lama-lama menjadi bukit.",
+      "Jangan takut gagal, takutlah untuk tidak mencoba."
+    ];
+
+    function showRandomQuote() {
+      const random = quotes[Math.floor(Math.random() * quotes.length)];
+      document.getElementById('dailyQuote').textContent = random;
+    }
+
+    function enterApp() {
+      const input = document.getElementById('usernameInput').value.trim();
+      if (!input) {
+        alert('Masukkan nama pengguna terlebih dahulu!');
+        return;
+      }
+      username = input;
+      document.getElementById('mainHeader').textContent = `FinansiKu - ${username}`;
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      showRandomQuote();
+    }
+    function showGuide() {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('guidePage').classList.remove('hidden');
+    }
+    function backToLogin() {
+      document.getElementById('guidePage').classList.add('hidden');
+      document.getElementById('loginPage').classList.remove('hidden');
+    }
+    function formatRupiah(angka) {
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR'
+      }).format(angka);
+    }
+    function updateDisplay() {
+      document.getElementById('currentBalance').textContent = formatRupiah(total);
+      document.getElementById('totalDisplay').textContent = `TOTAL: ${formatRupiah(total)}`;
+      document.getElementById('lossDisplay').textContent = `Kerugian: ${formatRupiah(loss)}`;
+    }
+    function addTransaction() {
+      const date = document.getElementById('date').value;
+      const desc = document.getElementById('desc').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      if (!date || !desc || isNaN(amount)) {
+        alert('Harap isi semua kolom dengan benar!');
+        return;
+      }
+      total += amount;
+      if (amount < 0) loss += Math.abs(amount);
+      transactions.push({ date, desc, amount });
+      const card = document.createElement('div');
+      card.className = `entry-card ${amount >= 0 ? 'income' : 'expense'}`;
+      card.innerHTML = `
+        <strong>${desc}</strong> <br/>
+        <small>${date}</small><br/>
+        Jumlah: ${formatRupiah(amount)}
+      `;
+      document.getElementById('entries').prepend(card);
+      updateDisplay();
+      updateChart();
+      document.getElementById('date').value = '';
+      document.getElementById('desc').value = '';
+      document.getElementById('amount').value = '';
+    }
+    function updateChart() {
+      const sorted = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+      const labels = sorted.map(t => t.date);
+      const data = sorted.map(t => t.amount);
+      if (chart) chart.destroy();
+      chart = new Chart(document.getElementById('myChart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Transaksi',
+            data,
+            borderColor: '#43cea2',
+            backgroundColor: 'rgba(67,198,172,0.13)',
+            tension: 0.2,
+            fill: true,
+            pointRadius: 5,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+      calculateGrowth(sorted);
+    }
+    function calculateGrowth(sorted) {
+      if (sorted.length >= 2) {
+        let first = sorted[0];
+        let last = sorted[sorted.length - 1];
+        let diffAmount = last.amount - first.amount;
+        let days = (new Date(last.date) - new Date(first.date)) / (1000 * 60 * 60 * 24);
+        let rate = days !== 0 ? diffAmount / days : 0;
+        document.getElementById('growthRate').textContent = `Pertumbuhan: ${formatRupiah(rate.toFixed(2))} /hari`;
+      } else {
+        document.getElementById('growthRate').textContent = `Pertumbuhan: 0 Rp/hari`;
+      }
+    }
+  </script>
+</body>
+</html>
